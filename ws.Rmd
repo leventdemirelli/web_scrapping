@@ -1,0 +1,306 @@
+---
+title: "Untitled"
+author: "Levent Demirelli"
+date: "2023-02-24"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#install.packages("magrittr")
+#install.packages("tidyverse")
+library(tidyverse)
+library(magrittr)
+library(rvest)
+library(stringr)
+library(dplyr)
+library(DataExplorer)
+```
+
+```{r}
+provinces <- c("Adana","Adiyaman","Afyonkarahisar","Agri","Aksaray","Amasya","Ankara","Antalya","Ardahan","Artvin","Aydin","Balikesir","Bartin","Batman","Bayburt","Bilecik","Bingol","Bitlis","Bolu","Burdur","Bursa","Canakkale","Cankiri","Corum","Denizli","Diyarbakir","Duzce","Edirne","Elazig","Erzincan","Erzurum","Eskisehir","Gaziantep","Giresun","Gumushane","Hakkari","Hatay","Igdir","Isparta","Istanbul","Izmir","Kahramanmaras","Karabuk","Karaman","Kars","Kastamonu","Kayseri","Kilis","Kirikkale","Kirklareli","Kirsehir","Kocaeli","Konya","Kutahya","Malatya","Manisa","Mardin","Mersin","Mugla","Mus","Nevsehir","Nigde","Ordu","Osmaniye","Rize","Sakarya","Samsun","Sanliurfa","Siirt","Sinop","Sirnak","Sivas","Tekirdag","Tokat","Trabzon","Tunceli","Usak","Van","Yalova","Yozgat","Zonguldak")
+
+provinces <- tolower(provinces)
+provinces
+```
+
+
+```{r}
+provinces <- c("Adana","Adiyaman","Afyonkarahisar","Aksaray","Amasya","Ankara","Antalya","Ardahan","Artvin","Aydin","Balikesir","Bartin","Batman","Bayburt","Bilecik","Bingol","Bitlis","Bolu","Burdur","Bursa","Canakkale","Cankiri","Corum","Denizli","Diyarbakir","Duzce","Edirne","Elazig","Erzurum","Eskisehir","Gaziantep","Giresun","Gumushane","Hatay","Isparta","Kahramanmaras","Karabuk","Karaman","Kars","Kastamonu","Kayseri","Kilis","Kirikkale","Kirklareli","Kirsehir","Kocaeli","Konya","Kutahya","Malatya","Manisa","Mardin","Mersin","Mugla","Mus","Nevsehir","Ordu","Osmaniye","Rize","Sakarya","Samsun","Sanliurfa","Siirt","Sinop","Sirnak","Sivas","Tekirdag","Trabzon","Tunceli","Usak","Van","Yalova","Yozgat")
+
+provinces <- tolower(provinces)
+provinces
+length(provinces)
+```
+
+agri (YOK), bartin (YOK), bitlis (YOK), burdur (YOK), erzincan, gaziantep (YOK), giresun (YOK), kastamonu (YOK), kilis (YOK), kırklareli (YOK), kocaeli (YOK), mugla (YOK), mus (YOK), sanliurfa (YOK), hakkari, igdir, istanbul, izmir, nigde, tokat, zonguldak
+
+```{r}
+start.time <- Sys.time()
+
+result <- vector("character",)
+
+
+for(i in provinces){
+    link = paste0("https://",i,".afad.gov.tr/il-muduru")
+    page = read_html(link)
+    page = page %>% html_nodes('p , .icerik') %>% html_text()
+    result[i] <- print(page)
+}
+result
+write_excel_csv(result)
+
+end.time <- Sys.time()
+time.taken <- end.time - start.time
+time.taken
+```
+
+
+```{r}
+veri = str_replace_all(result, "\r\n", "")
+veri
+```
+
+
+
+## Tokenization
+
+```{r}
+#install.packages("tidyverse")
+#install.packages("tokenizers")
+#install.packages("tidytext")
+#install.packages("hcandersenr")
+#install.packages('xlsx')     
+library(xlsx)
+library(tidyverse)
+library(tokenizers)
+library(tidytext)
+library(hcandersenr)
+```
+
+```{r}
+library(readr)
+raw <- read_csv("Desktop/13.txt", locale = locale())
+view(raw)
+```
+
+## Analiz
+
+```{r}
+
+library(readxl)
+cv <- read_excel("Library/CloudStorage/OneDrive-Kişisel/AFAD_makale/profil.xlsx")
+cv
+
+as.data.frame(table(cv$universite...11))
+table(cv$ikinci_üni)
+table(cv$onceki_kariyer)
+
+
+yas = (2023-cv$dogum_tarihi)
+
+yas = as.data.frame(yas, is.na = FALSE)
+y = na.omit(yas)
+mean(y$yas)
+sd(y$yas)
+
+
+cocuk = as.data.frame(cv$cocuk_sayisi, is.na = FALSE)
+c = na.omit(cocuk)
+mean(c$`cv$cocuk_sayisi`)
+
+a = as.data.frame(table(cv$memleket_son))
+a
+
+order(a$Freq,decreasing = FALSE)
+
+sort(a$Freq,decreasing = TRUE)
+
+
+order(a, na.last = TRUE, decreasing = FALSE,
+      method = c("Var1", "Freq"))
+
+cc <- read_excel("Desktop/Kitap4.xlsx", sheet = 3)
+as.data.frame(table(cc))
+
+
+cc <- read_excel("Desktop/Kitap2.xlsx", sheet = 2)
+cd = as.data.frame(table(cc))
+
+library(plyr)
+arrange(cd,desc(Freq))
+
+cc <- read_excel("Desktop/Kitap2.xlsx", sheet = 3)
+uni = as.data.frame(table(cc))
+uni
+
+library(plyr)
+arrange(uni,desc(Freq))
+
+
+cc <- read_excel("Desktop/Kitap2.xlsx", sheet = 5)
+fak = as.data.frame(table(cc))
+fak
+
+library(plyr)
+arrange(fak,desc(Freq))
+
+
+cc <- read_excel("Desktop/Kitap2.xlsx", sheet = 6)
+bol = as.data.frame(table(cc))
+bol
+
+arrange(bol,desc(Freq))
+
+cc <- read_excel("Desktop/Kitap2.xlsx", sheet = 7)
+mesl = as.data.frame(table(cc))
+mesl
+
+arrange(mesl,desc(Freq))
+
+cc <- read_excel("Desktop/Kitap2.xlsx", sheet = 8)
+ko = as.data.frame(table(cc))
+ko
+
+arrange(mesl,desc(Freq))
+```
+
+
+# Büyükelçilikler
+
+```{r}
+
+
+be <- c("kabil", "luanda","manama","kotonu","abudhabi","bandar","sofya","ugudugu","cezayir","cibuti","encemine","santodomingo","kito","cakarta","tallin","addisababa","abidjan","helsinki","librevil","banjul","akra","konakri","guatemala","zagreb","tahran","dublin","madrid","stokholm","bern","tokyo","punompen","yaounde","ottava","doha","astana","nairobi","bogota","brazavil","seul","sanhose","vilnius","luksemburg","budapeste","antananarivo","uskup","kualalumpur","bamako","valetta","meksika","kahire","ulanbator","kisinev","nuaksot","nepido","windhoek","niamey","oslo","taskent","panama","lima","kigali","pristine","belgrad","freetown","singapur","kolombo","hartum","santiago","dusanbe","darusselam","bangkok","tunus","askabat","kampala","amman","vatikan","karakas","hanoi","lusaka","harare","trablus","prag","bratislava","viyana","bruksel","saraybosna","pekin","roma","biskek","kuveyt","lefkosa","havana","beyrut","abuja","islamabad","varsova","lizbon","dakar","ljubljana","sana","wellington","vasington","buenosaires","kopenhag","rabat","manila","paris","pretoria","berlin","bukres","telaviv","bagdat","dakka","baku","moskova","riyad","londra","tiflis","kiev","lahey","yenidelhi","brezilya","riga","tiran","kanberra","atina","mogadisu","maputo","minsk","podgorica","muskat","juba","kinsasa","asmara","gaboron","bujumbura","malabo","viyentiyan","asuncion","lome","portofspain","montevideo")
+
+
+
+bk <- c("dubai","burgaz","filibe","kudus","meshed","tebriz","urumiye","barselona","cenevre","zurih","nagoya","montreal","toronto","vancouver","aktau","almati","iskenderiye","komrat","prizren","misurata","bregenz","salzburg","viyana","anvers","bruksel","mostar","guangzhou","hongkong","sanghay","milano","karaci","lahor","boston","houston","losangeles","miami","newyork","sikago","bordo","lyon","marsilya","nant","paris","strazburg","berlin","dusseldorf","essen","frankfurt","hamburg","hannover","karlsruhe","koln","mainz","munih","munster","nurnberg","stuttgart","kostence","erbil","gence","nahcivan","kazan","novorossisk","stpetersburg","cidde","edinburg","londra","batum","odessa","amsterdam","deventer","rotterdam","haydarabad","mumbai","saopaulo","melburn","sidney","atinapire","gumulcine","rodos","selanik","hargeysa","manchester","basra","musul","gazimagusa","semerkant","yenipazar")
+
+results1 = list()
+for(i in be){
+    link = paste0("http://",i,".be.mfa.gov.tr/Mission/Biography")
+    page = read_html(link)
+    page = page %>% html_nodes('#logoTextSuffix , #biographyContent , #applicationHeader') %>% html_text()
+    results1[[i]] = page
+    print(page)
+}
+
+results1
+
+
+results <- list()
+for(i in bk){
+    link = paste0("http://",i,".bk.mfa.gov.tr/Mission/Biography")
+    page = read_html(link)
+    page = page %>% html_nodes('#logoTextSuffix , #biographyContent , #applicationHeader') %>% html_text2()
+    results[[i]] = page
+    print(page)
+}
+results
+
+```
+
+banjaluka, capetown, mezarişerif
+
+
+# Valiler
+
+```{r}
+provinces <- c("Adana","Adiyaman","Afyonkarahisar","Agri","Aksaray","Amasya","Ankara","Antalya","Ardahan","Artvin","Aydin","Balikesir","Bartin","Batman","Bayburt","Bilecik","Bingol","Bitlis","Bolu","Burdur","Bursa","Canakkale","Cankiri","Corum","Denizli","Diyarbakir","Duzce","Edirne","Elazig","Erzincan","Erzurum","Eskisehir","Gaziantep","Giresun","Gumushane","Hakkari","Hatay","Igdir","Isparta","Istanbul","Izmir","Kahramanmaras","Karabuk","Karaman","Kars","Kastamonu","Kayseri","Kilis","Kirikkale","Kirklareli","Kirsehir","Kocaeli","Konya","Kutahya","Malatya","Manisa","Mardin","Mersin","Mugla","Mus","Nevsehir","Nigde","Ordu","Osmaniye","Rize","Sakarya","Samsun","Sanliurfa","Siirt","Sinop","Sirnak","Sivas","Tekirdag","Tokat","Trabzon","Tunceli","Usak","Van","Yalova","Yozgat","Zonguldak")
+
+provinces <- tolower(provinces)
+length(provinces)
+```
+
+```{r}
+provinces <- c("Adiyaman","Afyonkarahisar","Agri","Aksaray","Ankara","Antalya","Ardahan","Artvin","Aydin","Balikesir","Bartin","Batman","Bayburt","Bingol","Bitlis","Burdur","Bursa","Canakkale","Cankiri","Denizli","Diyarbakir","Edirne","Elazig","Erzincan","Erzurum","Eskisehir","Gaziantep","Giresun","Gumushane","Hakkari","Hatay","Igdir","Isparta","Istanbul","Izmir","Kahramanmaras","Karaman","Kars","Kastamonu","Kayseri","Kilis","Kirikkale","Kirklareli","Kirsehir","Kocaeli","Konya","Kutahya","Malatya","Manisa","Mardin","Mersin","Mugla","Mus","Nevsehir","Nigde","Ordu","Osmaniye","Rize","Sakarya","Samsun","Sanliurfa","Siirt","Sinop","Sirnak","Sivas","Tekirdag","Tokat","Trabzon","Tunceli","Usak","Van","Yalova","Yozgat","Zonguldak")
+
+provinces <- tolower(provinces)
+
+#sink("my_data.txt")
+#print(provinces,quote = FALSE)
+#sink()
+
+```
+
+404-error: amasya, bilecik, bolu, corum,Duzce, Karabuk
+
+adana, 
+
+```{r}
+extensions <- list()
+
+for(i in provinces){
+  link = paste0("http://",i,".gov.tr/yoneticilerimiz")
+  a = read_html(link) %>% html_elements("div.btn a") %>% html_attr("href")
+  extensions[[i]] = a
+  print(a)
+}
+extensions
+#sink("my_datas.txt")
+#print(extensions,quote = FALSE)
+#sink()
+```
+
+
+```{r}
+library (plyr)
+df <- ldply (extensions, data.frame)
+df
+
+df %>% filter(grepl('www', df$X..i..))
+
+df %>% filter(!grepl('www', df$X..i..))
+```
+
+```{r}
+url = "http://ankara.gov.tr/yoneticilerimiz"
+
+a = read_html(url) %>%
+  html_elements("div.btn a") %>%
+  html_attr("href")
+
+print(as.character(a))
+```
+
+
+```{r}
+url = "http://adiyaman.gov.tr/yoneticilerimiz"
+
+a = read_html(url) %>%
+  html_elements("div.btn") %>%
+  html_element("a") %>%
+  html_attrs()
+
+print(as.character(a))
+
+```
+
+
+
+```{r}
+extensions <- list()
+
+library(readxl)
+web <- read_excel("Desktop/web.xlsx")
+web
+for(i in web$`http://www.aydin.gov.tr/vali`){
+  link = i
+  page = read_html(link)
+  page = page %>% html_nodes('.page-title , .col-12+ .col-12') %>% html_text2()
+  extensions[[i]] = page
+  print(page)
+}
+extensions
+
+#sink("my_datas.txt")
+#print(extensions,quote = FALSE)
+#sink()
+```
+
+
+
+
+
